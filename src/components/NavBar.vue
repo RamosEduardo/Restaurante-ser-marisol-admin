@@ -55,9 +55,7 @@
               <em>Admin Ser Marisol</em>
             </template>
             <b-dropdown-item @click="logout()">Sair</b-dropdown-item>
-            <router-link to="/cadastro">
-              <b-dropdown-item>Adicionar Usuário</b-dropdown-item>
-            </router-link>
+            <b-dropdown-item @click="newUser()">Adicionar Usuário</b-dropdown-item>
           </b-nav-item-dropdown>
         </b-navbar-nav>
     </b-navbar>
@@ -80,6 +78,9 @@ export default {
     logout() {
       localStorage.removeItem('session');
       this.$router.push('/login')
+    },
+    newUser() {
+      this.$router.push('/cadastro')
     }
   },
 
