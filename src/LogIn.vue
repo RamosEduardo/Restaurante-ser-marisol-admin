@@ -25,7 +25,7 @@
           <b-row class="mt-4" style="display:flex; justify-content: center">
             <b-col>
               <!-- <router-link to="/"> -->
-                <b-button @click="login()" variant="danger" squared style="width:100%">Entrar</b-button>
+                <b-button @click="login()" :disabled="isClickButton" variant="danger" squared style="width:100%">Entrar</b-button>
               <!-- </router-link> -->
             </b-col>
           </b-row>
@@ -45,20 +45,24 @@ export default {
       loginForm: {
         email: '',
         senha: ''
-      }
+      },
+      isClickButton: false
     }
   },
   methods: {
     async login() {
+      this.isClickButton = true
       const response = await server.post('/login', this.loginForm);
       if (response.status === 200) {
         alert('Login Efetuado!')
         localStorage.setItem(
           'session', this.loginForm.email
         )
+        this.isClickButton = false
         this.$router.push('/')
       } else {
         alert('Tente Novamente!')
+        this.isClickButton = false
       }
     }
   }
