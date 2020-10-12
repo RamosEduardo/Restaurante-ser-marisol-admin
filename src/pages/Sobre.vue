@@ -64,7 +64,7 @@
                             Cancelar
             </b-button>-->
             <b-button
-              @click="salvar"
+              @click="salvar()"
               style="margin-left: 10px"
               variant="success"
               size="sm"
@@ -111,6 +111,9 @@ export default {
     async salvar() {
       this.isLoading = true;
       const info = this.sobre;
+
+      console.log('INFO ', info);
+
       await server.put("/infos/1", JSON.stringify({ info }));
       this.isLoading = false;
     },
