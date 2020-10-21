@@ -32,7 +32,7 @@
                       <b-icon icon="plus" />Adicionar Prato
                     </b-button>
                     <b-button
-                      @click="removerCardápio(cardapio.id)"
+                      @click="removerCardápio(cardapio._id)"
                       variant="danger"
                       size="sm"
                       class="d-flex justify-content-center align-items-center pt-10"
@@ -46,7 +46,7 @@
 
             <b-collapse v-model="cardapio.visible" class="mt-2">
               <div
-                v-for="(produto, indexProduto) in cardapio.produtosCardapio"
+                v-for="(produto, indexProduto) in cardapio.produtos"
                 :key="`produto-`+indexProduto"
                 style="padding:5px"
               >
@@ -55,7 +55,7 @@
                     <div>
                       <b-icon
                         icon="trash-fill"
-                        @click="removerPratoCardapio(produto.id,index)"
+                        @click="removerPratoCardapio(produto._id,index)"
                         variant="danger"
                         style="cursor: pointer;"
                       />
@@ -69,19 +69,6 @@
 
               <b-row v-show="newAdd" class="my-1">
                 <b-col lg="7" sm="12">Nome do Produto:</b-col>
-
-                <b-col lg="5" sm="12">
-                  <div style="display: flex; justify-content: space-between">
-                    <div>
-                      <b-icon
-                        @click="newCategoria = !newCategoria"
-                        style="cursor: pointer;"
-                        variant="success"
-                        icon="plus"
-                      />Categoria:
-                    </div>
-                  </div>
-                </b-col>
               </b-row>
 
               <b-row v-show="newAdd" class="my-1">
@@ -97,20 +84,12 @@
 
                 <b-col lg="5" sm="12">
                   <b-row>
-                    <b-col cols="8">
-                      <b-form-select
-                        class="mt-2"
-                        size="sm"
-                        v-model="pratoAdd.idCategoriaProduto"
-                        :options="listCategoriasCardapio"
-                      />
-                    </b-col>
                     <b-col cols="4" style="margin-auto">
                       <div
                         style="display: flex; flex-direction: row; justify-content: flex-end;padding-top: 10px"
                       >
                         <b-button
-                          @click="salvarPrato(cardapio)"
+                          @click="salvarPrato(cardapio, index)"
                           style="margin-right: 10px"
                           variant="outline-success"
                           size="sm"
@@ -158,38 +137,6 @@
     </b-row>
 
     <b-modal
-      title="Adicionar Categoria"
-      hide-footer
-      id="modal-no-backdrop"
-      hide-backdrop
-      v-model="newCategoria"
-    >
-      <b-row>
-        <b-col>
-          <b-form-input
-            v-model="categoriaAdd.nome"
-            class="mt-2"
-            id="input-small"
-            size="sm"
-            placeholder="Informe o nome da Categoria"
-          ></b-form-input>
-        </b-col>
-      </b-row>
-
-      <b-row>
-        <b-col>
-          <b-button
-            @click="adicionarCategoria"
-            variant="outline-success"
-            size="sm"
-            style="width:100%"
-            class="d-flex mt-2 justify-content-center align-items-center pt-10"
-          >Adicionar</b-button>
-        </b-col>
-      </b-row>
-    </b-modal>
-
-    <b-modal
       title="Adicionar Cardápio"
       hide-footer
       id="cardapio-modal"
@@ -234,12 +181,9 @@ export default {
   data() {
     return {
       cardapios: [],
-      categoriaCardapio: [],
       visible: false,
       pratoAdd: {},
-      categoriaAdd: {},
       newAdd: false,
-      newCategoria: false,
       newCardapio: {},
       newCardapioView: false,
       servEmpty,
@@ -248,17 +192,6 @@ export default {
 
   components: {
     "nav-bar": NavBar,
-  },
-
-  computed: {
-    listCategoriasCardapio() {
-      return this.categoriaCardapio.map((categoria) => {
-        return {
-          value: categoria.id,
-          text: categoria.nome,
-        };
-      });
-    },
   },
 
   methods: {
@@ -270,7 +203,7 @@ export default {
     removerCardápio(idCardapio) {
       server.delete("/cardapios/" + idCardapio).then(() => {
         const cardapios = _.filter(this.cardapios, (cardapio) => {
-          return cardapio.id !== idCardapio;
+          return cardapio._id !== idCardapio;
         });
         this.cardapios = cardapios;
       });
@@ -279,56 +212,30 @@ export default {
     removerPratoCardapio(idPrato, indexCardapio) {
       server.delete("/produto-cardapio/" + idPrato).then(() => {
         const produtosCardapio = _.filter(
-          this.cardapios[indexCardapio].produtosCardapio,
+          this.cardapios[indexCardapio].produtos,
           (produto) => {
-            return produto.id !== idPrato;
+            return produto._id !== idPrato;
           }
         );
         this.cardapios[indexCardapio].produtosCardapio = produtosCardapio;
+        this.listCardapios()
       });
     },
 
-    salvarPrato({ id }) {
-      this.pratoAdd.idCardapio = id;
-
-      server.post("/produto-cardapio", this.pratoAdd).then((resp) => {
-        const idProdutoCardapio = resp.data[0];
-
-        this.cardapios.forEach((cardapio) => {
-          if (cardapio.id == this.pratoAdd.idCardapio) {
-            if (!cardapio.produtosCardapio) {
-              cardapio.produtosCardapio = [];
-            }
-            cardapio.produtosCardapio.push({
-              id: idProdutoCardapio,
-              nome: this.pratoAdd.nome,
-              idCategoriaProduto: this.pratoAdd.idCategoriaProduto,
-            });
-          }
-        });
-        this.pratoAdd = {};
-        this.newAdd = false;
-      });
+    async salvarPrato(cardapio, indexCardapio) {
+      this.pratoAdd.cardapio = cardapio._id;
+      await server.post("/produto-cardapio", this.pratoAdd)
+      this.cardapios[indexCardapio].produtos.push(this.pratoAdd)
+      this.newAdd = false;
+      this.pratoAdd = {}
     },
 
     async adicionarCardapio() {
       const { data } = await server.post("/cardapios", this.newCardapio);
       this.newCardapioView = false;
       this.cardapios.push({
-        id: data.id,
+        _id: data._id,
         titulo: this.newCardapio.titulo,
-      });
-    },
-
-    async adicionarCategoria() {
-      const { data } = await server.post(
-        "/categoria-cardapio",
-        this.categoriaAdd
-      );
-      this.newCategoria = false;
-      this.categoriaCardapio.push({
-        id: data.id,
-        nome: this.categoriaAdd.nome,
       });
     },
 
@@ -339,17 +246,10 @@ export default {
       });
       this.cardapios = data;
     },
-
-    async listCategoriasProdutos() {
-      const { data } = await server.get("/categoria-cardapio");
-      const { categoriasCardapio } = data;
-      this.categoriaCardapio = categoriasCardapio;
-    },
   },
 
   created() {
     this.listCardapios();
-    this.listCategoriasProdutos();
   },
 };
 </script>

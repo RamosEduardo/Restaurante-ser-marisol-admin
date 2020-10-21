@@ -15,9 +15,9 @@
                 </b-col>
 
                 <b-col cols="2">
-                  <b-row :name="item.id">
+                  <b-row :name="item._id">
                     <b-button
-                      @click="removerItem(item.id)"
+                      @click="removerItem(item._id)"
                       variant="outline-danger"
                       size="sm"
                       class="d-flex justify-content-center align-items-center pt-10"
@@ -64,7 +64,7 @@ export default {
     removerItem(idItem) {
       server.delete("/servicosOferecidos/" + idItem).then(() => {
         const newServico = _.filter(this.servicos, function (o) {
-          return o.id !== idItem;
+          return o._id !== idItem;
         });
         this.servicos = newServico;
       });
