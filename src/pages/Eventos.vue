@@ -25,14 +25,14 @@
                 </b-col>
 
                 <b-col cols="2">
-                  <b-row :name="evento.id">
-                    <router-link :to="'/eventos-fotos/' + evento.id">
+                  <b-row :name="evento._id">
+                    <router-link :to="'/eventos-fotos/' + evento._id">
                       <b-button
                         variant="outline-info"
                         size="sm"
                         class="d-flex mr-2 mb-2 justify-content-center align-items-center pt-10"
                       >
-                        <router-link :to="`/eventos-fotos/${evento.id}`">
+                        <router-link :to="`/eventos-fotos/${evento._id}`">
                           <b-icon icon="box-arrow-in-up-right" />
                         </router-link>
                       </b-button>
@@ -48,7 +48,7 @@
                     </b-button>
 
                     <b-button
-                      @click="removerEvento(evento.id)"
+                      @click="removerEvento(evento._id)"
                       variant="outline-danger"
                       size="sm"
                       class="d-flex mr-2 mb-2 justify-content-center align-items-center pt-10"
@@ -124,7 +124,7 @@
       <b-row>
         <b-col>
           <b-button
-            v-if="novoEvento.id"
+            v-if="novoEvento._id"
             @click="atualizarEventos"
             variant="outline-success"
             size="sm"
@@ -175,8 +175,8 @@ export default {
 
     adicionarEventos() {
       server.post("/eventos", this.novoEvento).then((resp) => {
-        const idEvento = resp.data.id;
-        this.novoEvento.id = idEvento;
+        const idEvento = resp.data._id;
+        this.novoEvento._id = idEvento;
         this.eventos.push(this.novoEvento);
         this.novoEventoView = false;
       });
@@ -196,7 +196,7 @@ export default {
     removerEvento(id) {
       server.delete("/eventos/" + id).then(() => {
         const eventos = _.filter(this.eventos, (evento) => {
-          return evento.id !== id;
+          return evento._id !== id;
         });
         this.eventos = eventos;
       });
