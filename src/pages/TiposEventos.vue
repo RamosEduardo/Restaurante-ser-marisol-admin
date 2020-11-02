@@ -175,7 +175,7 @@ export default {
     removerServico({ id }) {
       server.delete("/servicos/" + id).then(() => {
         const newServicosList = _.filter(this.servicos, (servico) => {
-          return servico.id !== id;
+          return servico._id !== id;
         });
 
         this.servicos = newServicosList;

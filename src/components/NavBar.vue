@@ -9,9 +9,6 @@
             <b-menu>
               <b-menu-list>
                 <b-menu-item expanded>
-                  <router-link :to="'/sobre'">
-                    <b-menu-item icon="information-outline" label="Sobre"></b-menu-item>
-                  </router-link>
                   <router-link :to="'/cardapios'">
                     <b-menu-item icon="book-open" label="Cardápio"></b-menu-item>
                   </router-link>
