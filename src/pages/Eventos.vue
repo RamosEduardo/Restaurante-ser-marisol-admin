@@ -125,7 +125,7 @@
         <b-col>
           <b-button
             v-if="novoEvento._id"
-            @click="atualizarEventos"
+            @click="atualizarEventos(novoEvento)"
             variant="outline-success"
             size="sm"
             style="width:100%"
@@ -183,14 +183,20 @@ export default {
     },
 
     setAtualizaEvento(evento) {
-      this.novoEvento = evento;
+      this.novoEvento = {
+        _id: evento._id,
+        titulo: evento.titulo,
+        data: moment.utc(evento.data).format("YYYY-MM-DD")
+      }
       this.novoEventoView = true;
     },
 
-    atualizarEventos() {
-      server.put("/eventos", this.novoEvento).then(() => {
-        this.novoEventoView = false;
-      });
+    async atualizarEventos() {
+      await server.put("/eventos", {
+        ...this.novoEvento
+      })
+      this.novoEventoView = false;
+      this.listEventos()
     },
 
     removerEvento(id) {

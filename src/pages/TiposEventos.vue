@@ -39,7 +39,7 @@
                 </b-card-text>
 
                 <b-button
-                  @click="removerServico(servico)"
+                  @click="removerServico(servico._id)"
                   style="width:100%"
                   variant="outline-danger"
                   size="sm"
@@ -172,13 +172,10 @@ export default {
       this.servicoSelecionado = servico;
     },
 
-    removerServico({ id }) {
-      server.delete("/servicos/" + id).then(() => {
-        const newServicosList = _.filter(this.servicos, (servico) => {
-          return servico._id !== id;
-        });
-
-        this.servicos = newServicosList;
+    async removerServico(id) {
+      await server.delete("/servicos/" + id)
+      this.servicos = _.filter(this.servicos, (servico) => {
+        return servico._id !== id;
       });
     },
 
