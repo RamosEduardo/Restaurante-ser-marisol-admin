@@ -32,7 +32,7 @@
                       <b-icon icon="plus" />Adicionar Prato
                     </b-button>
                     <b-button
-                      @click="removerCardápio(cardapio.id)"
+                      @click="removerCardápio(cardapio._id)"
                       variant="danger"
                       size="sm"
                       class="d-flex justify-content-center align-items-center pt-10"
@@ -70,7 +70,7 @@
               <b-row v-show="newAdd" class="my-1">
                 <b-col lg="7" sm="12">Nome do Produto:</b-col>
 
-                <b-col lg="5" sm="12">
+                <!-- <b-col lg="5" sm="12">
                   <div style="display: flex; justify-content: space-between">
                     <div>
                       <b-icon
@@ -81,29 +81,20 @@
                       />Categoria:
                     </div>
                   </div>
-                </b-col>
+                </b-col> -->
               </b-row>
 
               <b-row v-show="newAdd" class="my-1">
-                <b-col lg="7" sm="12">
-                  <b-form-input
-                    v-model="pratoAdd.nome"
-                    class="mt-2"
-                    id="input-small"
-                    size="sm"
-                    placeholder="Informe o Produto"
-                  ></b-form-input>
-                </b-col>
-
-                <b-col lg="5" sm="12">
+                <b-col>
                   <b-row>
-                    <b-col cols="8">
-                      <b-form-select
+                    <b-col lg="8" sm="8" style="margin-auto">
+                      <b-form-input
+                        v-model="pratoAdd.nome"
                         class="mt-2"
+                        id="input-small"
                         size="sm"
-                        v-model="pratoAdd.idCategoriaProduto"
-                        :options="listCategoriasCardapio"
-                      />
+                        placeholder="Informe o Produto"
+                      ></b-form-input>
                     </b-col>
                     <b-col cols="4" style="margin-auto">
                       <div
@@ -267,13 +258,10 @@ export default {
         this.cardapios[cardapioIndex].visible = true;
       this.newAdd = !this.newAdd;
     },
-    removerCardápio(idCardapio) {
-      server.delete("/cardapios/" + idCardapio).then(() => {
-        const cardapios = _.filter(this.cardapios, (cardapio) => {
-          return cardapio.id !== idCardapio;
-        });
-        this.cardapios = cardapios;
-      });
+    async removerCardápio(idCardapio) {
+      console.log('DELETE idCardapio ', idCardapio);
+      await server.delete("/cardapios/" + idCardapio)
+      await this.listCardapios()
     },
 
     removerPratoCardapio(idPrato, indexCardapio) {
@@ -313,6 +301,9 @@ export default {
 
     async adicionarCardapio() {
       const { data } = await server.post("/cardapios", this.newCardapio);
+
+      console.log('DAT ', data);
+
       this.newCardapioView = false;
       this.cardapios.push({
         id: data.id,
