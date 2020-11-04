@@ -52,8 +52,8 @@ export default {
   methods: {
     async login() {
       this.isClickButton = true
-      const response = await server.post('/login', this.loginForm);
-      if (response.status === 200) {
+      const { data } = await server.post('/login', this.loginForm);
+      if (data.status === 200) {
         alert('Login Efetuado!')
         localStorage.setItem(
           'session', this.loginForm.email
@@ -61,7 +61,7 @@ export default {
         this.isClickButton = false
         this.$router.push('/')
       } else {
-        alert('Tente Novamente!')
+        alert('Tente Novamente! ' + JSON.stringify(data.msg))
         this.isClickButton = false
       }
     }
