@@ -13,7 +13,7 @@
             <b-icon icon="file-plus" />Novas Fotos
           </b-button>
           <b-list-group>
-            <b-list-group-item>{{ evento.titulo + ' - ' + evento.data }}</b-list-group-item>
+            <b-list-group-item>{{ evento.titulo + ' - ' + getDateFromStringDate(evento.data) }}</b-list-group-item>
           </b-list-group>
 
           <b-row class="mt-3">
@@ -92,9 +92,10 @@
 
 <script>
 // import Botao from "../components/Botao";
-import NavBar from "../components/NavBar";
-import _ from "lodash";
-import server from "../service/server";
+import NavBar from "../components/NavBar"
+import _ from "lodash"
+import server from "../service/server"
+import moment from "moment"
 
 export default {
   data() {
@@ -133,10 +134,14 @@ export default {
     removerFoto(id) {
       server.delete("/fotos-eventos/" + id).then(() => {
         const fotos = _.filter(this.evento.fotos, foto => {
-          return foto.id !== id;
+          return foto._id !== id;
         });
         this.evento.fotos = fotos;
       });
+    },
+
+    getDateFromStringDate(date) {
+      return moment.utc(date).format("DD/MM/YYYY");
     },
 
     async listFotosEventos() {

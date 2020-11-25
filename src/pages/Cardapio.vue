@@ -72,18 +72,16 @@
               </b-row>
 
               <b-row v-show="newAdd" class="my-1">
-                <b-col lg="7" sm="12">
-                  <b-form-input
-                    v-model="pratoAdd.nome"
-                    class="mt-2"
-                    id="input-small"
-                    size="sm"
-                    placeholder="Informe o Produto"
-                  ></b-form-input>
-                </b-col>
-
-                <b-col lg="5" sm="12">
+                <b-col>
                   <b-row>
+                     <b-col lg="8" sm="8" style="margin-auto">
+                      <b-form-input
+                        v-model="pratoAdd.nome"
+                        class="mt-2"
+                        id="input-small"
+                        size="sm"
+                      />	
+                    </b-col>
                     <b-col cols="4" style="margin-auto">
                       <div
                         style="display: flex; flex-direction: row; justify-content: flex-end;padding-top: 10px"
@@ -200,34 +198,32 @@ export default {
         this.cardapios[cardapioIndex].visible = true;
       this.newAdd = !this.newAdd;
     },
-    removerCardápio(idCardapio) {
-      server.delete("/cardapios/" + idCardapio).then(() => {
-        const cardapios = _.filter(this.cardapios, (cardapio) => {
-          return cardapio._id !== idCardapio;
-        });
-        this.cardapios = cardapios;
+    async removerCardápio(idCardapio) {
+      await server.delete("/cardapios/" + idCardapio)
+      this.cardapios = _.filter(this.cardapios, (cardapio) => {
+        return cardapio._id !== idCardapio;
       });
     },
 
-    removerPratoCardapio(idPrato, indexCardapio) {
-      server.delete("/produto-cardapio/" + idPrato).then(() => {
-        const produtosCardapio = _.filter(
-          this.cardapios[indexCardapio].produtos,
-          (produto) => {
-            return produto._id !== idPrato;
-          }
-        );
-        this.cardapios[indexCardapio].produtosCardapio = produtosCardapio;
-        this.listCardapios()
-      });
+    async removerPratoCardapio(idPrato, indexCardapio) {
+      await server.delete("/produto-cardapio/" + idPrato)
+      this.cardapios[indexCardapio].produtos = _.filter(
+        this.cardapios[indexCardapio].produtos, (produto) => {
+          return produto._id !== idPrato;
+        }
+      );
     },
 
     async salvarPrato(cardapio, indexCardapio) {
-      this.pratoAdd.cardapio = cardapio._id;
-      await server.post("/produto-cardapio", this.pratoAdd)
-      this.cardapios[indexCardapio].produtos.push(this.pratoAdd)
-      this.newAdd = false;
-      this.pratoAdd = {}
+      try {
+        this.pratoAdd.cardapio = cardapio._id;
+        const { data } = await server.post("/produto-cardapio", this.pratoAdd)
+        this.cardapios[indexCardapio].produtos.push(data)
+        this.newAdd = false;
+        this.pratoAdd = {}
+      } catch (error) {
+        throw new Error(JSON.stringify(error))
+      }
     },
 
     async adicionarCardapio() {

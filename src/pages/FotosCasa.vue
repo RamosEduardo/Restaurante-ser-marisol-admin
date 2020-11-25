@@ -26,7 +26,7 @@
                 class="mb-2"
               >
                 <b-button
-                  @click="removerFoto(foto.id)"
+                  @click="removerFoto(foto._id)"
                   style="width:100%"
                   variant="outline-danger"
                   size="sm"
@@ -115,35 +115,33 @@ export default {
   },
 
   methods: {
-    submitFile() {
+    async submitFile() {
       let formData = new FormData();
-      formData.append("file", this.file);
-      this.adicionarFotosView = false;
-
-      server
-        .post("/fotos-casa/", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        })
-        .then(() => {
-          this.listFotos();
-        })
-        .catch((e) => {
-          alert(JSON.stringify(e.message))
-        });
+      formData.append("file", this.file)
+      this.adicionarFotosView = false
+      await server.post("/fotos-casa/", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }).catch((e) => {
+        alert(JSON.stringify(e.message))
+      });
+      this.listFotos()
     },
     handleFileUpload() {
       this.file = this.$refs.file.files[0];
     },
 
-    removerFoto(id) {
-      server.delete("/fotos-casa/" + id).then(() => {
-        const fotos = _.filter(this.fotos, (foto) => {
-          return foto.id !== id;
-        });
-        this.fotos = fotos;
-      });
+    async removerFoto(id) {
+      console.log('ID ', id)
+      try {
+        await server.delete('/fotos-casa/'+id)
+        this.fotos = _.filter(this.fotos, (foto) => {
+          return foto._id !== id;
+        })
+      } catch (error) {
+        throw new Error(error)
+      }
     },
 
     async listFotos() {
