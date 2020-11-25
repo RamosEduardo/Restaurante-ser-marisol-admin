@@ -33,7 +33,7 @@
                 class="mb-2"
               >
                 <b-button
-                  @click="removerFoto(foto.id)"
+                  @click="removerFoto(foto._id)"
                   style="width:100%"
                   variant="outline-danger"
                   size="sm"
