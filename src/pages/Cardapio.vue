@@ -1,5 +1,9 @@
 <template>
   <div>
+    <loading :active.sync="isLoading" 
+      :can-cancel="false" 
+      :is-full-page="true"
+    />
     <nav-bar />
     <b-container v-if="cardapios && cardapios.length > 0">
       <b-row style="margin-top: 20px; display:flex; justify-content:center">
@@ -113,18 +117,24 @@ import NavBar from "../components/NavBar";
 import _ from "lodash";
 import server from "@/service/server";
 
+ import Loading from 'vue-loading-overlay';
+    // Import stylesheet
+  import 'vue-loading-overlay/dist/vue-loading.css';
+
 export default {
   data() {
     return {
       file: "",
       cardapios: [],
       adicionarCardapiosView: false,
-      titulo: ''
+      titulo: '',
+      isLoading: false
     };
   },
 
   methods: {
     async submitFile() {
+      this.isLoading = true;
       let formData = new FormData();
       formData.append("file", this.file)
       this.adicionarCardapiosView = false
@@ -135,7 +145,8 @@ export default {
       }).catch((e) => {
         alert(JSON.stringify(e.message))
       });
-      this.listCardapios()
+      await this.listCardapios()
+      this.isLoading = false
     },
     handleFileUpload() {
       this.file = this.$refs.file.files[0];
@@ -143,29 +154,35 @@ export default {
 
     async removerCardapio(id) {
       console.log('ID ', id)
+      this.isLoading = true
       try {
         await server.delete('/cardapios/'+id)
         this.cardapios = _.filter(this.cardapios, (foto) => {
           return foto._id !== id;
         })
+        this.isLoading = false
       } catch (error) {
+        this.isLoading = false
         throw new Error(error)
       }
     },
 
     async listCardapios() {
+      this.isLoading = true
       const { data } = await server.get("/pratos");
 
       data.forEach((foto) => {
         foto.caminho = "../../../../backend/assets/uploads/casa/" + foto.imagem;
       });
       this.cardapios = [...data];
+      this.isLoading = false
     },
   },
 
   components: {
     // "button-icon": Botao,
     "nav-bar": NavBar,
+    loading: Loading,
   },
 
   async created() {

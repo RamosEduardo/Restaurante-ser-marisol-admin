@@ -1,5 +1,9 @@
 <template>
   <div>
+    <loading :active.sync="isLoading" 
+      :can-cancel="false" 
+      :is-full-page="true"
+    />
     <nav-bar />
     <b-container v-if="evento">
       <b-row style="margin-top: 20px; display:flex; justify-content:center">
@@ -97,18 +101,24 @@ import _ from "lodash"
 import server from "../service/server"
 import moment from "moment"
 
+import Loading from 'vue-loading-overlay';
+  // Import stylesheet
+import 'vue-loading-overlay/dist/vue-loading.css';
+
 export default {
   data() {
     return {
       file: "",
       evento: [],
       novoEvento: {},
-      adicionarFotosView: false
+      adicionarFotosView: false,
+      isLoading: false
     };
   },
 
   methods: {
     submitFile() {
+      this.isLoading = true
       let formData = new FormData();
 
       formData.append("file", this.file);
@@ -123,21 +133,25 @@ export default {
         .then(() => {
           this.adicionarFotosView = false;
           this.listFotosEventos();
+          this.isLoading = false
         })
         .catch(() => {
           this.adicionarFotosView = false;
+          this.isLoading = false
         });
     },
     handleFileUpload() {
       this.file = this.$refs.file.files[0];
     },
     removerFoto(id) {
+      this.isLoading = true
       server.delete("/fotos-eventos/" + id).then(() => {
         const fotos = _.filter(this.evento.fotos, foto => {
           return foto._id !== id;
         });
         this.evento.fotos = fotos;
       });
+      this.isLoading = false
     },
 
     getDateFromStringDate(date) {
@@ -145,13 +159,16 @@ export default {
     },
 
     async listFotosEventos() {
+      this.isLoading = true
       const { evento } = this.$route.params;
       const { data } = await server.get(`/evento/${evento}`)
       this.evento = data;
+      this.isLoading = false
     }
   },
   components: {
-    "nav-bar": NavBar
+    "nav-bar": NavBar,
+    loading: Loading
   },
 
   async created() {

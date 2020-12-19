@@ -1,5 +1,9 @@
 <template>
   <div>
+    <loading :active.sync="isLoading" 
+      :can-cancel="false" 
+      :is-full-page="true"
+    />
     <nav-bar />
     <b-container v-if="fotos && fotos.length > 0">
       <b-row style="margin-top: 20px; display:flex; justify-content:center">
@@ -103,6 +107,9 @@
 import NavBar from "../components/NavBar";
 import _ from "lodash";
 import server from "@/service/server";
+import Loading from 'vue-loading-overlay';
+  // Import stylesheet
+import 'vue-loading-overlay/dist/vue-loading.css';
 
 export default {
   data() {
@@ -111,11 +118,13 @@ export default {
       fotos: [],
       fotosSelecionadas: [],
       adicionarFotosView: false,
+      isloading: false
     };
   },
 
   methods: {
     async submitFile() {
+      this.isLoading = true
       let formData = new FormData();
       formData.append("file", this.file)
       this.adicionarFotosView = false
@@ -126,37 +135,45 @@ export default {
       }).catch((e) => {
         alert(JSON.stringify(e.message))
       });
-      this.listFotos()
+      await this.listFotos()
+      this.isLoading = false
     },
     handleFileUpload() {
       this.file = this.$refs.file.files[0];
     },
 
     async removerFoto(id) {
+      this.isLoading = true
       console.log('ID ', id)
       try {
         await server.delete('/fotos-casa/'+id)
         this.fotos = _.filter(this.fotos, (foto) => {
           return foto._id !== id;
         })
+
+        this.isLoading = false
       } catch (error) {
+        this.isLoading = false
         throw new Error(error)
       }
     },
 
     async listFotos() {
+      this.isLoading = true
       const { data } = await server.get("/fotos-casa");
 
       data.forEach((foto) => {
         foto.caminho = "../../../../backend/assets/uploads/casa/" + foto.imagem;
       });
       this.fotos = [...data];
+      this.isLoading = false
     },
   },
 
   components: {
     // "button-icon": Botao,
     "nav-bar": NavBar,
+    loading: Loading
   },
 
   async created() {

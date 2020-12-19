@@ -1,5 +1,9 @@
 <template>
   <div>
+    <loading :active.sync="isLoading" 
+      :can-cancel="false" 
+      :is-full-page="true"
+    />
     <nav-bar />
     <b-container v-if="eventos.length > 0">
       <b-row style="margin-top: 20px; display:flex; justify-content:center">
@@ -152,6 +156,9 @@ import NavBar from "../components/NavBar";
 import _ from "lodash";
 import moment from "moment";
 import server from "../service/server";
+import Loading from 'vue-loading-overlay';
+  // Import stylesheet
+import 'vue-loading-overlay/dist/vue-loading.css';
 
 export default {
   data() {
@@ -159,27 +166,33 @@ export default {
       eventos: [],
       novoEvento: {},
       novoEventoView: false,
+      isLoading: false
     };
   },
 
   methods: {
     async listEventos() {
+      this.isLoading = true
       server.get("/all-eventos").then((resp) => {
         this.eventos = resp.data.eventos;
       });
+      this.isLoading = false
     },
 
     getFormatedDate(date) {
       return moment.utc(date).format("DD/MM/YYYY");
     },
 
-    adicionarEventos() {
+    async adicionarEventos() {
+      this.isLoading = true
       server.post("/eventos", this.novoEvento).then((resp) => {
         const idEvento = resp.data._id;
         this.novoEvento._id = idEvento;
         this.eventos.push(this.novoEvento);
         this.novoEventoView = false;
       });
+      await this.listEventos()
+      this.isLoading = false
     },
 
     setAtualizaEvento(evento) {
@@ -192,30 +205,37 @@ export default {
     },
 
     async atualizarEventos() {
+      this.isLoading = true
       await server.put("/eventos", {
         ...this.novoEvento
       })
+      await this.listEventos()
       this.novoEventoView = false;
-      this.listEventos()
+      this.isLoading = false
     },
 
     removerEvento(id) {
+      this.isLoading = true
       server.delete("/eventos/" + id).then(() => {
         const eventos = _.filter(this.eventos, (evento) => {
           return evento._id !== id;
         });
         this.eventos = eventos;
       });
+      this.isLoading = false
     },
   },
 
   components: {
     // "button-icon": Botao,
     "nav-bar": NavBar,
+    loading: Loading
   },
 
   async created() {
+    this.isLoading = true
     await this.listEventos();
+    this.isLoading = false
   },
 };
 </script>
