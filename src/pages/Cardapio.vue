@@ -153,10 +153,9 @@ export default {
     },
 
     async removerCardapio(id) {
-      console.log('ID ', id)
       this.isLoading = true
       try {
-        await server.delete('/cardapios/'+id)
+        await server.delete('/pratos/'+id)
         this.cardapios = _.filter(this.cardapios, (foto) => {
           return foto._id !== id;
         })
