@@ -112,8 +112,6 @@ export default {
       this.isLoading = true;
       const info = this.sobre;
 
-      console.log('INFO ', info);
-
       await server.put("/infos/1", JSON.stringify({ info }));
       this.isLoading = false;
     },

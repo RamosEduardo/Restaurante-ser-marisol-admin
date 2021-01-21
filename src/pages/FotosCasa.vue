@@ -144,7 +144,6 @@ export default {
 
     async removerFoto(id) {
       this.isLoading = true
-      console.log('ID ', id)
       try {
         await server.delete('/fotos-casa/'+id)
         this.fotos = _.filter(this.fotos, (foto) => {

@@ -46,14 +46,21 @@
 
         <!-- Right aligned nav items -->
         <b-navbar-nav class="ml-auto">
-          <b-nav-item-dropdown left>
+          <b-nav-item-dropdown v-if="isAdmin === 'true'" left>
             <!-- Using 'button-content' slot -->
             <template v-slot:button-content>
               <em>Admin Ser Marisol</em>
             </template>
             <b-dropdown-item @click="logout()">Sair</b-dropdown-item>
-            <b-dropdown-item @click="newUser()">Adicionar Usuário</b-dropdown-item>
+            <div>
+              <b-dropdown-item @click="newUser()">
+                Novo Usuário
+              </b-dropdown-item>
+            </div>
           </b-nav-item-dropdown>
+          <div v-else>
+            <span style="color: white; cursor: pointer" @click="logout()">Sair</span>
+          </div>
         </b-navbar-nav>
     </b-navbar>
   </div>
@@ -68,12 +75,14 @@ export default {
   data() {
     return {
       viewSideBar: false,
+      isAdmin: localStorage.getItem('isAdmin')
     }
   },
 
   methods: {
     logout() {
       localStorage.removeItem('session');
+      localStorage.removeItem('isAdmin');
       this.$router.push('/login')
     },
     newUser() {

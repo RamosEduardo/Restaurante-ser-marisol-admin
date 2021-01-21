@@ -29,6 +29,17 @@
             </b-col>
           </b-row>
           {{ verificaSenhas }}
+          <br />
+          <b-row class="mt-4">
+            <b-col cols="12">
+              Conceder permissão de administrador?
+              <b-field>
+                <b-checkbox v-model="newUser.isAdmin">
+                  {{ newUser.isAdmin ? 'Sim' : 'Não' }}
+                </b-checkbox>
+              </b-field>
+            </b-col>
+          </b-row>
           <b-row class="mt-4" style="display:flex; justify-content: center">
             <b-col>
               <b-button @click="cadastrar()" variant="danger" squared style="width:100%">
@@ -39,8 +50,8 @@
 
           <b-row class="mt-4" style="display:flex; justify-content: center">
             <b-col>
-              <router-link to='/login'>
-                Já sou Cadastrado
+              <router-link to='/'>
+                Voltar ao meu painel
               </router-link>
             </b-col>
           </b-row>
@@ -60,7 +71,8 @@ export default {
       newUser: {
         senha: '',
         confirmacaoSenha: '',
-        email: ''
+        email: '',
+        isAdmin: false
       }
     }
   },

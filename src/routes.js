@@ -9,6 +9,7 @@ import	Cardapios	from	'./pages/Cardapio.vue'
 import	Eventos	from	'./pages/Eventos.vue'
 import	EventosFotos	from	'./pages/EventosFotos.vue'
 import	FotosCasa	from	'./pages/FotosCasa.vue'
+import RecuperarSenha from './RecuperarSenha.vue'
 
 export const	routes =	[
   {	path:	'/login',	component:	Login	},
@@ -21,5 +22,6 @@ export const	routes =	[
   {	path:	'/eventos',	component:	Eventos	},
   {	path:	'/eventos-fotos/:evento',	component:	EventosFotos	},
   {	path:	'/fotos-casa',	component:	FotosCasa	},
+  {	path:	'/recuperar',	component:	RecuperarSenha	},
   {	path:	'/',	component:	Home	},
 ]

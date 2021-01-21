@@ -1,5 +1,9 @@
 <template>
   <div class="logon-container">
+      <loading :active.sync="isClickButton" 
+        :can-cancel="false" 
+        :is-full-page="true"
+      />
       <b-col className="form" cols="5">
 
         <form>
@@ -12,28 +16,37 @@
 
           <b-row class="mt-4">
             <b-col cols="12">
-              <b-form-input v-model="loginForm.email" placeholder="Login"></b-form-input>
+              Email:
+              <b-form-input v-model="rememberForm.email" placeholder="E-mail:"></b-form-input>
+            </b-col>
+          </b-row>
+
+          <b-row class="mt-4">
+            <b-col cols="12">
+              Senha antiga:
+              <b-form-input v-model="rememberForm.senhaAntiga" type="password" placeholder="Senha antiga"></b-form-input>
             </b-col>
           </b-row>
 
           <b-row class="mt-2">
             <b-col cols="12">
-              <b-form-input v-model="loginForm.senha" type="password"></b-form-input>
+              Nova senha:
+              <b-form-input v-model="rememberForm.novaSenha" type="password" placeholder="Nova Senha"></b-form-input>
             </b-col>
           </b-row>
 
           <b-row class="mt-4" style="display:flex; justify-content: center">
             <b-col>
               <!-- <router-link to="/"> -->
-                <b-button @click="login()" :disabled="isClickButton" variant="danger" squared style="width:100%">Entrar</b-button>
+                <b-button @click="remember()" :disabled="isClickButton" variant="danger" squared style="width:100%">Confirmar</b-button>
               <!-- </router-link> -->
             </b-col>
           </b-row>
 
           <b-row class="mt-4" style="display:flex; justify-content: center">
             <b-col>
-              <router-link to="/recuperar">
-                  Esqueci minha senha
+              <router-link to="/login">
+                  Voltar para login
               </router-link>
             </b-col>
           </b-row>
@@ -46,32 +59,34 @@
 <script>
 
 import server from '@/service/server'
+import Loading from 'vue-loading-overlay';
+  // Import stylesheet
+import 'vue-loading-overlay/dist/vue-loading.css';
 
 export default {
   data() {
     return {
-      loginForm: {
-        email: '',
-        senha: ''
+      rememberForm: {
+        senhaAntiga: '',
+        novaSenha: '',
+        email: ''
       },
       isClickButton: false
     }
   },
+  components: {
+    loading: Loading
+  },
   methods: {
-    async login() {
+    async remember() {
       this.isClickButton = true
-      const { data } = await server.post('/login', this.loginForm);
+      const { data } = await server.put('/recovery', this.rememberForm);
+      this.isClickButton = false
       if (data.status === 200) {
-        alert('Login Efetuado!')
-        localStorage.setItem(
-          'session', this.loginForm.email
-        )
-        localStorage.setItem('isAdmin', data.isAdmin)
-        this.isClickButton = false
-        this.$router.push('/')
+        alert('Senha Alterada!')
+        this.$router.push('/login')
       } else {
-        alert('Tente Novamente! ' + JSON.stringify(data.msg))
-        this.isClickButton = false
+        alert('Ocorreu um problema! ' + JSON.stringify(data.msg))
       }
     }
   }
