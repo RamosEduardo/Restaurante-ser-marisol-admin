@@ -185,13 +185,12 @@ export default {
 
     async adicionarEventos() {
       this.isLoading = true
-      server.post("/eventos", this.novoEvento).then((resp) => {
-        const idEvento = resp.data._id;
-        this.novoEvento._id = idEvento;
-        this.eventos.push(this.novoEvento);
-        this.novoEventoView = false;
-      });
-      await this.listEventos()
+      const { data } = await server.post("/eventos", this.novoEvento)
+      const idEvento = data.id;
+
+      this.novoEvento._id = idEvento;
+      this.eventos.push(this.novoEvento);
+      this.novoEventoView = false;
       this.isLoading = false
     },
 
