@@ -56,6 +56,9 @@
               <b-dropdown-item @click="newUser()">
                 Novo Usuário
               </b-dropdown-item>
+              <!-- <b-dropdown-item @click="newUser()">
+                Lista de Usuários
+              </b-dropdown-item> -->
             </div>
           </b-nav-item-dropdown>
           <div v-else>

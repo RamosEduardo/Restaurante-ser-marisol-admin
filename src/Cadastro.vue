@@ -32,12 +32,13 @@
           <br />
           <b-row class="mt-4">
             <b-col cols="12">
-              Conceder permissão de administrador?
+              <b-checkbox v-model="newUser.isAdmin">
+                Conceder permissão de administrador?
+              </b-checkbox>
+              <!-- Conceder permissão de administrador?
               <b-field>
-                <b-checkbox v-model="newUser.isAdmin">
-                  {{ newUser.isAdmin ? 'Sim' : 'Não' }}
-                </b-checkbox>
-              </b-field>
+                
+              </b-field> -->
             </b-col>
           </b-row>
           <b-row class="mt-4" style="display:flex; justify-content: center">
